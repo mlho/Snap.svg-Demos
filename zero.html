@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js"></script>
+
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      background-color: black;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      flex: 1;
+    }
+
+    #snappy {
+      width: 300px;
+      height: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class='container'>
+    <svg id="snappy"></svg>
+  </div>
+
+
+  <script>
+    $(function() {
+      var s = Snap('#snappy');
+
+      Snap.load('svg/zero.svg',
+        function(lf) {
+          s.append(lf);
+
+          var xArrow = Snap('#x-arrow');
+          var yArrow = Snap('#y-arrow');
+
+          var xBox = xArrow.getBBox();
+          var yBox = yArrow.getBBox();
+
+          $('#snappy').mousemove(function() {
+            xArrow.transform('t' + Math.floor(event.pageX - $('#snappy').position().left - xBox.width / 2) + ',0');
+            yArrow.transform('t0,' + Math.floor(event.pageY - $('#snappy').position().top - yBox.height / 2));
+          });
+
+          function start() {
+            s.unclick(start);
+
+            for (var i = 1; i < 7; i++) {
+              var l = Snap('#line-' + i);
+              var b = Snap('#blur-' + i);
+
+              var lineLength = Snap.path.getTotalLength(l);
+              var blurLength = Snap.path.getTotalLength(b);
+
+              l.attr({
+                'stroke-dasharray': lineLength,
+                'stroke-dashoffset': lineLength
+              });
+
+              b.attr({
+                'stroke-dasharray': blurLength,
+                'stroke-dashoffset': blurLength
+              });
+            }
+
+            function anim(n) {
+              if (n < 7) {
+                Snap('#line-' + n).animate({
+                  'stroke-dashoffset': 0
+                }, 200, mina.easein);
+
+                Snap('#blur-' + n).animate({
+                  'stroke-dashoffset': 0
+                }, 200, mina.easein, () => {
+                  anim(n + 1)
+                });
+              } else {
+                s.click(start);
+              }
+            }
+
+            anim(1);
+          }
+
+          s.click(start);
+          start();
+        });
+    });
+  </script>
+</body>
+
+</html>

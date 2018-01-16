@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #ececec;
+    }
+
+    #snappy {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="snappy"></svg>
+
+
+  <script>
+    function getDistance(x1, y1, x2, y2) {
+      return Math.floor(Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2)));
+    }
+
+    function radToDeg(rad) {
+      return Math.floor((180 / Math.PI) * rad);
+    }
+
+    $(function() {
+      var s = Snap('#snappy');
+
+      Snap.load('svg/arm.svg',
+        function(lf) {
+          var g = lf.select('#group');
+
+          s.append(g);
+
+          var mount = Snap('#mount');
+          var mBox = mount.getBBox();
+
+          var center = Math.floor(window.innerWidth / 2);
+          var centerOffset = center - Math.floor(mBox.width / 2);
+
+          g.transform('t' + centerOffset);
+
+          var upperArm = Snap('#upper-arm');
+          var lowerArm = Snap('#lower-arm');
+          var claw = Snap('#claw');
+          var rGrip = Snap('#right-grip');
+          var lGrip = Snap('#left-grip');
+
+          var upperPivot = Snap('#upper-pivot');
+          var lowerPivot = Snap('#lower-pivot');
+          var clawPivot = Snap('#claw-pivot');
+          var rightPivot = Snap('#right-pivot');
+          var leftPivot = Snap('#left-pivot');
+
+          var upBox = upperPivot.getBBox();
+          var lowBox = lowerPivot.getBBox();
+          var clawBox = clawPivot.getBBox();
+          var rGripBox = rightPivot.getBBox();
+          var lGripBox = leftPivot.getBBox();
+
+          upperArm.transform('r135,' + upBox.cx + ',' + upBox.cy);
+          lowerArm.transform('r-90,' + lowBox.cx + ',' + lowBox.cy);
+          claw.transform('r0,' + clawBox.cx + ',' + clawBox.cy);
+          rGrip.transform('r-30,' + rGripBox.cx + ',' + rGripBox.cy);
+          lGrip.transform('r30,' + lGripBox.cx + ',' + lGripBox.cy);
+
+          $('#snappy').mousedown(function() {
+            rGrip.transform('r0,' + rGripBox.cx + ',' + rGripBox.cy);
+            lGrip.transform('r0,' + lGripBox.cx + ',' + lGripBox.cy);
+          });
+
+          $('#snappy').mouseup(function() {
+            rGrip.transform('r-30,' + rGripBox.cx + ',' + rGripBox.cy);
+            lGrip.transform('r30,' + lGripBox.cx + ',' + lGripBox.cy);
+          });
+
+          var guide = s.line(upBox.cx + centerOffset, upBox.cy, upBox.cx + centerOffset, upBox.cy);
+
+          // guide.attr({
+          //   'stroke': 'red',
+          //   'stroke-dasharray': '10 5'
+          // });
+
+          var a = getDistance(lowBox.cx, lowBox.cy, clawBox.cx, clawBox.cy);
+          var b = getDistance(upBox.cx, upBox.cy, lowBox.cx, lowBox.cy);
+
+          $('#snappy').mousemove(function() {
+            guide.attr({
+              x2: event.pageX,
+              y2: event.pageY
+            });
+
+            var c = getDistance(upBox.cx + centerOffset, upBox.cy, event.pageX, event.pageY);
+            var offsetAngle = radToDeg(Math.atan((event.pageY - upBox.cy) / (event.pageX - (upBox.cx + centerOffset))));
+            var angleA = radToDeg(Math.acos((-Math.pow(a, 2) + Math.pow(b, 2) + Math.pow(c, 2)) / (2 * b * c)));
+            var angleC = 180 - radToDeg(Math.acos((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b)));
+
+            if (isNaN(angleA)) {
+              angleA = 0;
+            }
+
+            if ((offsetAngle < 0 && event.pageY > upBox.cy) || (offsetAngle >= 0 && event.pageY < upBox.cy)) { // 2nd Quadrant + 3rd Quadrant
+              offsetAngle += 180;
+            }
+
+            upperArm.transform('r' + (angleA + offsetAngle) + ',' + upBox.cx + ',' + upBox.cy);
+
+            if (c > a - b) {
+              lowerArm.transform('r' + -angleC + ',' + lowBox.cx + ',' + lowBox.cy);
+            }
+          });
+        }
+      );
+    });
+  </script>
+</body>
+
+</html>
