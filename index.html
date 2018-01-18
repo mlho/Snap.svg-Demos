@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Quicksand:300" rel="stylesheet">
+
+	<style>
+		html,
+		body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			overflow: hidden;
+			background-color: #000000;
+		}
+
+		iframe {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			border: 0;
+		}
+
+		img {
+			display: block;
+			padding: 20px;
+		}
+
+		#controls {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: fixed;
+			bottom: 0;
+			margin: 30px;
+			color: #ffffff;
+			background-color: #000000;
+			border-radius: 20px;
+			font-family: 'Quicksand', sans-serif;
+			font-size: 30px;
+			font-weight: bold;
+
+		}
+
+		button {
+			color: #ffffff;
+			background-color: #000000;
+			border: 3px solid #ffffff;
+			border-radius: 50%;
+			width: 50px;
+			height: 50px;
+			margin: 20px;
+			vertical-align: middle;
+			font-family: 'Quicksand', sans-serif;
+			font-size: 30px;
+			font-weight: bold;
+		}
+
+		button:hover {
+			color: #000000;
+			background-color: #ffffff;
+		}
+
+		button:disabled {
+			color: #000000;
+			background-color: #888888;
+			border: 3px solid #888888;
+		}
+	</style>
+</head>
+
+<body>
+	<iframe id="frame" src="arm.html"></iframe>
+
+	<div id="controls">
+		<a href="https://github.com/mlho/Snap.svg-Demos">
+			<img src="GitHub-Mark-Light-64px.png" alt="GitHub" title="View Source Code">
+		</a>
+		<div>
+			<button id="prev" class="button"> P </button>
+			<span id="count"></span>
+			<button id="next" class="button"> N </button>
+		</div>
+	</div>
+	<script>
+		var idx = 0;
+		var docs = ['arm.html', 'hand.html', 'zero.html'];
+
+		$('#prev').prop('disabled', true);
+		$('#count').html((idx + 1) + '/' + docs.length);
+
+		$('#prev').click(function() {
+			$('#next').prop('disabled', false);
+			$('#frame').attr('src', docs[--idx]);
+			$('#count').html((idx + 1) + '/' + docs.length);
+
+			if (idx < 1) {
+				$('#prev').prop('disabled', true);
+			}
+		});
+
+		$('#next').click(function() {
+			$('#prev').prop('disabled', false);
+			$('#frame').attr('src', docs[++idx]);
+			$('#count').html((idx + 1) + '/' + docs.length);
+
+			if (idx > docs.length - 2) {
+				$('#next').prop('disabled', true);
+			}
+		});
+	</script>
+</body>
+
+</html>
