@@ -72,7 +72,7 @@
 </head>
 
 <body>
-	<iframe id="frame" src="arm.html"></iframe>
+	<iframe src="arm.html"></iframe>
 
 	<div id="controls">
 		<a href="https://github.com/mlho/Snap.svg-Demos">
@@ -88,12 +88,19 @@
 		var idx = 0;
 		var docs = ['arm.html', 'hand.html', 'zero.html'];
 
-		$('#prev').prop('disabled', true);
-		$('#count').html((idx + 1) + '/' + docs.length);
+		$(function(){
+			$('iframe').remove();
+			$('<iframe>', {src: docs[0]}).appendTo('body');
+
+			$('#prev').prop('disabled', true);
+			$('#count').html((idx + 1) + '/' + docs.length);
+		});
 
 		$('#prev').click(function() {
+			$('iframe').remove();
+			$('<iframe>', {src: docs[--idx]}).appendTo('body');
+
 			$('#next').prop('disabled', false);
-			$('#frame').attr('src', docs[--idx]);
 			$('#count').html((idx + 1) + '/' + docs.length);
 
 			if (idx < 1) {
@@ -102,8 +109,10 @@
 		});
 
 		$('#next').click(function() {
+			$('iframe').remove();
+			$('<iframe>', {src: docs[++idx]}).appendTo('body');
+
 			$('#prev').prop('disabled', false);
-			$('#frame').attr('src', docs[++idx]);
 			$('#count').html((idx + 1) + '/' + docs.length);
 
 			if (idx > docs.length - 2) {
